@@ -94,10 +94,11 @@ public final class SakuraExPlug extends JavaPlugin {
 							if (canDo) {
 								long newTime = System.currentTimeMillis();
 								long timeInt = newTime - imgCommandTimeFlag;
-								imgCommandTimeFlag = newTime;
 								if (timeInt > Config.INSTANCE.imgCD.get()) {
 									((ImgCommand) Commands.IMG.get()).setImageFolder(imgFolder);
 									Commands.IMG.get().react(group, sender, rawMessage[1], source);
+									// 成功执行，更新执行时间
+									imgCommandTimeFlag = newTime;
 								} else {
 									MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(source, sender)
 											.append("\n").append(Commands.IMG.getName())
