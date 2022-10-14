@@ -25,11 +25,11 @@ public class Utils {
 			} catch (Exception e) {
 				SakuraExPlug.logger.error(e.toString());
 				downloadImage(url, imagePath, tryCount - 1);
+				return "err";
 			}
 		} else {
 			return "err";
 		}
-		return "";
 	}
 	
 	public static void addQQ(Friend sender, MessageChainBuilder mcb, long qqNumber) {
@@ -42,8 +42,15 @@ public class Utils {
 			sender.sendMessage(fail.asMessageChain());
 		}
 	}
-	
-	public static void currentWhiteQQList(Friend sender, MessageChainBuilder mcb, long qqNumber) {
-	
+	public static void removeQQ(Friend sender, MessageChainBuilder mcb, long qqNumber) {
+		if (Config.INSTANCE.whiteQQList.get().contains(qqNumber)) {
+			Config.INSTANCE.whiteQQList.get().remove(qqNumber);
+			mcb.append("Remove ").append(Long.toString(qqNumber)).append(" successfully.");
+			sender.sendMessage(mcb.asMessageChain());
+		} else {
+			MessageChainBuilder fail = new MessageChainBuilder().append(Long.toString(qqNumber)).append(" does not exist in whiteQQList.");
+			sender.sendMessage(fail.asMessageChain());
+		}
 	}
+	
 }

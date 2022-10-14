@@ -1,8 +1,11 @@
 package cn.sakuraex.sakuraexplug.image;
 
+import cn.sakuraex.sakuraexplug.config.Config;
 import net.mamoe.mirai.utils.MiraiLogger;
 
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 public class ImgFolder {
 	
@@ -14,10 +17,9 @@ public class ImgFolder {
 			logger.info("Create ImgFolder: " + imgFolder.getPath());
 		}
 		//图片分类文件夹
-		for (ImageKind value : ImageKind.values()) {
-			extendFolder(imgFolder, value.getName(), logger);
+		for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
+			extendFolder(imgFolder, entry.getKey(), logger);
 		}
-		
 	}
 	
 	private static boolean createFolder(File folder) {

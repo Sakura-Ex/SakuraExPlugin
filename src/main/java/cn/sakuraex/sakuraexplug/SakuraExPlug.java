@@ -4,7 +4,6 @@ import cn.sakuraex.sakuraexplug.command.Commands;
 import cn.sakuraex.sakuraexplug.command.ImgCommand;
 import cn.sakuraex.sakuraexplug.config.Config;
 import cn.sakuraex.sakuraexplug.config.Default;
-import cn.sakuraex.sakuraexplug.image.ImageKind;
 import cn.sakuraex.sakuraexplug.image.ImgFolder;
 import cn.sakuraex.sakuraexplug.util.MessageUtil;
 import cn.sakuraex.sakuraexplug.util.Utils;
@@ -28,6 +27,8 @@ import net.mamoe.mirai.utils.MiraiLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,8 +87,8 @@ public final class SakuraExPlug extends JavaPlugin {
 						if (hasMember) {
 							boolean canDo = false;
 							if (rawMessage.length > 1) {
-								for (ImageKind value : ImageKind.values()) {
-									canDo = canDo || rawMessage[1].equals(value.getName());
+								for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
+									canDo = canDo || rawMessage[1].equals(entry.getKey());
 								}
 							}
 							if (canDo) {
@@ -123,7 +124,6 @@ public final class SakuraExPlug extends JavaPlugin {
 			public void onMessage(FriendMessageEvent event) {
 				String[] rawMessage = event.getMessage().contentToString().split(" ");
 				Friend sender = event.getSender();
-				OnlineMessageSource source = event.getSource();
 				switch (rawMessage[0]) {
 					case "/help": {
 						sender.sendMessage(Default.HELP_INFO);
@@ -141,8 +141,8 @@ public final class SakuraExPlug extends JavaPlugin {
 										}
 									}
 									sender.sendMessage(mcb.asMessageChain());
+									break;
 								}
-								break;
 								case "whitelist": {
 									MessageChainBuilder mcb = new MessageChainBuilder().append("whitelist:\n");
 									for (Map.Entry<Long, List<Long>> entry : Config.INSTANCE.whitelist.get().entrySet()) {
@@ -156,46 +156,77 @@ public final class SakuraExPlug extends JavaPlugin {
 										}
 									}
 									sender.sendMessage(mcb.asMessageChain());
+									break;
 								}
-								break;
+								case "whiteQQList:": {
+									MessageChainBuilder mcb = new MessageChainBuilder().append("whiteQQList:\n");
+									for (long qqNumber : Config.INSTANCE.whiteQQList.get()) {
+										mcb.append("\t-").append(String.valueOf(qqNumber)).append("\n");
+									}
+									sender.sendMessage(mcb.asMessageChain());
+									break;
+								}
 							}
 							break;
 						} else {
 							MessageChainBuilder mcb = new MessageChainBuilder().append("Usage: /check <info>\n")
 									.append("Where the <info> can be:\n").append("\t-imageAPIs\n").append("\t-whitelist\n")
-									.append("\t-whiteQQList\n").append("\t-imgRetryCount\n").append("\t-imgCD");
+									.append("\t-whiteQQList\n");
 							sender.sendMessage(mcb.asMessageChain());
 						}
 						break;
 					}
 					case "/img": {
+						Map<String, List<String>> apis = Config.INSTANCE.imageAPIs.get();
 						if (rawMessage.length > 3 && ("add".equals(rawMessage[1]) || "remove".equals(rawMessage[1]))) {
-							boolean canDo = false;
-							for (ImageKind value : ImageKind.values()) {
-								canDo = canDo || rawMessage[2].equals(value.getName());
-							}
-							if (canDo) {
-								Map<String, List<String>> apis = Config.INSTANCE.imageAPIs.get();
-								List<String> typedLink = apis.get(rawMessage[2]);
-								if ("add".equals(rawMessage[1])) {
-									if (typedLink.contains(rawMessage[3])) {
-										sender.sendMessage("Api Link:" + rawMessage[3] + " is already in the imageAPIs.");
-									} else {
-										apis.get(rawMessage[2]).add(rawMessage[3]);
-										sender.sendMessage("Add api Link: " + rawMessage[3] + " successfully.");
-									}
+							if ("add".equals(rawMessage[1])) {
+								List<String> typedLink;
+								if (apis.containsKey(rawMessage[2])) {
+									typedLink = apis.get(rawMessage[2]);
 								} else {
-									if (apis.get(rawMessage[2]).remove(rawMessage[3])) {
-										sender.sendMessage("Remove api Link: " + rawMessage[3] + " successfully.");
-									} else {
-										sender.sendMessage("Api Link:" + rawMessage[3] + " does not exist the imageAPIs.");
+									try	{
+										new URL(rawMessage[3]);
+										typedLink = new ArrayList<>();
+										apis.put(rawMessage[2], typedLink);
+										ImgFolder.createImgFolder(imgFolder, logger);
+									} catch (MalformedURLException e) {
+										sender.sendMessage("Please check the api link.");
+										break;//若URL不正确，则结束switch
 									}
 								}
+								if (typedLink.contains(rawMessage[3])) {
+									sender.sendMessage("Api Link " + rawMessage[3] + " is already in the imageAPIs.");
+								} else {
+									apis.get(rawMessage[2]).add(rawMessage[3]);
+									sender.sendMessage("Add api Link " + rawMessage[3] + " successfully.");
+								}
 							} else {
-								sender.sendMessage("Please enter correct type value.");
+								if (apis.containsKey(rawMessage[2])) {
+									if (apis.get(rawMessage[2]).remove(rawMessage[3])) {
+										sender.sendMessage("Remove api Link " + rawMessage[3] + " successfully.");
+									} else {
+										sender.sendMessage("Api Link " + rawMessage[3] + " does not exist.");
+									}
+								} else {
+									sender.sendMessage("Type value " + rawMessage[2] + " does not exist.");
+								}
+							}
+						} else if ("remove".equals(rawMessage[1]) && rawMessage.length == 3) {
+							if (apis.containsKey(rawMessage[2])) {
+								apis.remove(rawMessage[2]);
+								File delete = new File(imgFolder, rawMessage[2]);
+								File[] files = delete.listFiles();
+								if (files != null) {
+									for (File file : files) {
+										file.delete();
+									}
+								}
+								delete.delete();
+							} else {
+								sender.sendMessage("Type value " + rawMessage[2] + " does not exist.");
 							}
 						} else {
-							sender.sendMessage("Usage: /img (add / remove) <type> <api link>");
+							sender.sendMessage("Usage: /img add <type> <api link>\n/img remove <type> [api link]");
 						}
 						break;
 					}
@@ -277,10 +308,25 @@ public final class SakuraExPlug extends JavaPlugin {
 							long qqNumber = sender.getId();
 							Utils.addQQ(sender, mcb, qqNumber);
 						}
-					break;
+						break;
+					}
+					case "/deop": {
+						MessageChainBuilder mcb = new MessageChainBuilder();
+						if (rawMessage.length > 1) {
+							try {
+								long qqNumber = Long.parseLong(rawMessage[1]);
+								Utils.removeQQ(sender, mcb, qqNumber);
+							} catch (NumberFormatException e) {
+								sender.sendMessage("Please enter right qq number.");
+							}
+						} else {
+							long qqNumber = sender.getId();
+							Utils.removeQQ(sender, mcb, qqNumber);
+						}
+						break;
 					}
 					default:
-						sender.sendMessage("Try use /help to learn what can I do.");
+						sender.sendMessage("Try using /help to learn what can I do.");
 				}
 			}
 		});

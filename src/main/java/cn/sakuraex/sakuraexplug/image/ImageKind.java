@@ -1,17 +1,10 @@
 package cn.sakuraex.sakuraexplug.image;
 
-import java.util.HashMap;
-
 public enum ImageKind {
 	COMIC("https://imgapi.cn/api.php?fl=dongman"),
-	HUMAN("https://imgapi.cn/cos.php?return=img"),
+	GIRL("https://imgapi.cn/api.php?fl=meizi"),
 	LANDSCAPE("https://imgapi.cn/api.php?fl=fengjing");
 	
-	public static final HashMap<String, String> kindMap = new HashMap<String, String>() {{
-		for (ImageKind value : ImageKind.values()) {
-			put(value.name, value.URL);
-		}
-	}};
 	private final String name;
 	private final String URL;
 	
