@@ -213,15 +213,20 @@ public final class SakuraExPlug extends JavaPlugin {
 							}
 						} else if ("remove".equals(rawMessage[1]) && rawMessage.length == 3) {
 							if (apis.containsKey(rawMessage[2])) {
+								boolean isDeleted = true;
 								apis.remove(rawMessage[2]);
 								File delete = new File(imgFolder, rawMessage[2]);
 								File[] files = delete.listFiles();
 								if (files != null) {
 									for (File file : files) {
-										file.delete();
+										isDeleted = file.delete() && isDeleted;
 									}
 								}
-								delete.delete();
+								if (delete.delete() && isDeleted) {
+									logger.info("Delete type folder successfully.");
+								} else {
+									logger.info("Type folder deletion failed.");
+								}
 							} else {
 								sender.sendMessage("Type value " + rawMessage[2] + " does not exist.");
 							}
