@@ -1,6 +1,5 @@
 package cn.sakuraex.sakuraexplug;
 
-import cn.sakuraex.sakuraexplug.command.Commands;
 import cn.sakuraex.sakuraexplug.command.ImgCommand;
 import cn.sakuraex.sakuraexplug.config.Config;
 import cn.sakuraex.sakuraexplug.config.Default;
@@ -41,7 +40,7 @@ public final class SakuraExPlug extends JavaPlugin {
 	private long imgCommandTimeFlag = 0;
 	
 	private SakuraExPlug() {
-		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.1.0")
+		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.1.1")
 				.name("SakuraExPluginQQ")
 				.author("SakuraEx")
 				.info("SakuraEx's assistant")
@@ -78,39 +77,9 @@ public final class SakuraExPlug extends JavaPlugin {
 				OnlineMessageSource source = event.getSource();
 				switch (rawMessage[0]) {
 					case "/img": {
-						Map<Long, List<Long>> whitelist = Config.INSTANCE.whitelist.get();
-						boolean hasMember = Config.INSTANCE.whiteQQList.get().contains(sender.getId());
-						if (whitelist.containsKey(group.getId())) {
-							hasMember = hasMember || whitelist.get(group.getId()).isEmpty();
-							hasMember = hasMember || whitelist.get(group.getId()).contains(sender.getId());
-						}
-						if (hasMember) {
-							boolean canDo = false;
-							if (rawMessage.length > 1) {
-								for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
-									canDo = canDo || rawMessage[1].equals(entry.getKey());
-								}
-							}
-							if (canDo) {
-								long newTime = System.currentTimeMillis();
-								long timeInt = newTime - imgCommandTimeFlag;
-								if (timeInt > Config.INSTANCE.imgCD.get()) {
-									((ImgCommand) Commands.IMG.get()).setImageFolder(imgFolder);
-									Commands.IMG.get().react(group, sender, rawMessage[1], source);
-									// 成功执行，更新执行时间
-									imgCommandTimeFlag = newTime;
-								} else {
-									MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(source, sender)
-											.append("\n").append(Commands.IMG.getName())
-											.append(" 太频繁了，年轻人要节制哦，请冷静一会儿吧\n").append("Left: ")
-											.append(String.valueOf(Config.INSTANCE.imgCD.get() - timeInt))
-											.append(" ms");
-									group.sendMessage(mcb.asMessageChain());
-								}
-							} else {
-								Commands.IMG.get().help(group, sender, source);
-							}
-						}
+						ImgCommand imgCommand = new ImgCommand(event.getMessage().contentToString(), group, sender, source, imgFolder, imgCommandTimeFlag);
+						imgCommand.react();
+						imgCommandTimeFlag = imgCommand.getTimeFlag();
 						break;
 					}
 					case "/calc": {
