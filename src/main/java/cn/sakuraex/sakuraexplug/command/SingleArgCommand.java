@@ -4,43 +4,47 @@ import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.User;
 import net.mamoe.mirai.message.data.OnlineMessageSource;
 
-public abstract class SingleArgCommand<T extends Contact> implements ICommand {
+public abstract class SingleArgCommand<T extends Contact> extends AbstractCommand<T> {
 	
-	private String[] rawMessage;
-	private T contact;
-	private User user;
-	private OnlineMessageSource source;
+	private final String argName;
+	private final boolean argOmissible;
 	
-	protected SingleArgCommand() {}
-	
-	protected SingleArgCommand(String rawMessage, T contact, User user, OnlineMessageSource source) {
-		setRawMessage(rawMessage);
-		this.contact = contact;
-		this.user = user;
-		this.source = source;
+	protected SingleArgCommand(String argName) {
+		this(argName, false);
+	}
+	protected SingleArgCommand(String argName, boolean argOmissible) {
+		this.argName = argName;
+		this.argOmissible = argOmissible;
 	}
 	
-	public String[] getRawMessage() {
-		return rawMessage;
+	protected SingleArgCommand(String rawMessage, T contact, User user, OnlineMessageSource source, String argName) {
+		this(rawMessage, contact, user, source, argName, false);
 	}
 	
-	public T getContact() {
-		return contact;
+	protected SingleArgCommand(String rawMessage, T contact, User user, OnlineMessageSource source, String argName, boolean argOmissible) {
+		super(rawMessage, contact, user, source);
+		this.argName = argName;
+		this.argOmissible = argOmissible;
 	}
 	
-	public User getUser() {
-		return user;
+	protected String getArg() {
+		return getRawMessage().length > 1 ? getRawMessage()[1] : "";
 	}
 	
-	public OnlineMessageSource getSource() {
-		return source;
+	protected String getArgName() {
+		return argName;
 	}
 	
-	private void setRawMessage(String rawMessage) {
-		this.rawMessage = rawMessage.split(" ");
+	protected boolean isArgOmissible() {
+		return argOmissible;
 	}
 	
-	public String getArg() {
-		return rawMessage[1];
+	@Override
+	public String usageHelp() {
+		if (argOmissible) {
+			return getName() + " [" + getArgName() + "]";
+		} else {
+			return getName() + " <" + getArgName() + ">";
+		}
 	}
 }

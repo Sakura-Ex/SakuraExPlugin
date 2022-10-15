@@ -1,8 +1,12 @@
 package cn.sakuraex.sakuraexplug;
 
-import cn.sakuraex.sakuraexplug.command.ImgCommand;
+import cn.sakuraex.sakuraexplug.command.AbstractCommand;
+import cn.sakuraex.sakuraexplug.command.commands.friend.CheckCommand;
+import cn.sakuraex.sakuraexplug.command.commands.friend.DeOpCommand;
+import cn.sakuraex.sakuraexplug.command.commands.friend.OpCommand;
+import cn.sakuraex.sakuraexplug.command.commands.group.CalcCommand;
+import cn.sakuraex.sakuraexplug.command.commands.group.ImgCommand;
 import cn.sakuraex.sakuraexplug.config.Config;
-import cn.sakuraex.sakuraexplug.config.Default;
 import cn.sakuraex.sakuraexplug.image.ImgFolder;
 import cn.sakuraex.sakuraexplug.util.MessageUtil;
 import cn.sakuraex.sakuraexplug.util.Utils;
@@ -14,14 +18,12 @@ import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.contact.Member;
 import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
-import net.mamoe.mirai.message.data.OnlineMessageSource;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,12 +58,22 @@ public final class SakuraExPlug extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		super.onEnable();
-		
+		// Prepare for /img
 		File imgFolder = resolveDataFile("img");
-		
 		ImgFolder.createImgFolder(imgFolder, logger);
-		
+		// Load config.
 		reloadPluginConfig(Config.INSTANCE);
+		// Storage command types.
+		List<AbstractCommand<Group>> groupCommands = new ArrayList<AbstractCommand<Group>>() {{
+			add(ImgCommand.INSTANCE);
+			add(CalcCommand.INSTANCE);
+		}};
+		
+		List<AbstractCommand<Friend>> friendCommands = new ArrayList<AbstractCommand<Friend>>() {{
+			add(CheckCommand.INSTANCE);
+			add(OpCommand.INSTANCE);
+			add(DeOpCommand.INSTANCE);
+		}};
 		
 		GlobalEventChannel.INSTANCE.registerListenerHost(new SimpleListenerHost() {
 			@Override
@@ -69,23 +81,28 @@ public final class SakuraExPlug extends JavaPlugin {
 				super.handleException(context, exception);
 			}
 			
+			// Group Message
 			@EventHandler
 			public void onMessage(GroupMessageEvent event) {
-				String[] rawMessage = event.getMessage().contentToString().split(" ");
-				Group group = event.getGroup();
-				Member sender = event.getSender();
-				OnlineMessageSource source = event.getSource();
-				switch (rawMessage[0]) {
-					case "/img": {
-						ImgCommand imgCommand = new ImgCommand(event.getMessage().contentToString(), group, sender, source, imgFolder, imgCommandTimeFlag);
-						imgCommand.react();
-						imgCommandTimeFlag = imgCommand.getTimeFlag();
-						break;
-					}
-					case "/calc": {
-						MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(source, sender);
-						group.sendMessage(mcb.append("This method might be realized one day").asMessageChain());
-						break;
+				if (Utils.hasPermission(event)) {
+					String commandType = event.getMessage().contentToString().split(" ")[0];
+					switch (commandType) {
+						case "/img":
+							ImgCommand imgCommand = new ImgCommand(event, imgFolder, imgCommandTimeFlag);
+							imgCommand.react();
+							imgCommandTimeFlag = imgCommand.getTimeFlag();
+							break;
+						case "/calc":
+							new CalcCommand(event).react();
+							break;
+						case "/help":
+							MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(event.getSource(), event.getSender());
+							mcb.append("Available Command:\n");
+							for (AbstractCommand<Group> command : groupCommands) {
+								mcb.append(command.usageHelp()).append("\n");
+							}
+							event.getGroup().sendMessage(mcb.asMessageChain());
+							break;
 					}
 				}
 			}
@@ -96,7 +113,12 @@ public final class SakuraExPlug extends JavaPlugin {
 				Friend sender = event.getSender();
 				switch (rawMessage[0]) {
 					case "/help": {
-						sender.sendMessage(Default.HELP_INFO);
+						MessageChainBuilder mcb = new MessageChainBuilder();
+						mcb.append("Available Command:\n");
+						for (AbstractCommand<Friend> command : friendCommands) {
+							mcb.append(command.usageHelp()).append("\n");
+						}
+						event.getSender().sendMessage(mcb.asMessageChain());
 						break;
 					}
 					case "/check": {
@@ -154,7 +176,7 @@ public final class SakuraExPlug extends JavaPlugin {
 								if (apis.containsKey(rawMessage[2])) {
 									typedLink = apis.get(rawMessage[2]);
 								} else {
-									try	{
+									try {
 										new URL(rawMessage[3]);
 										typedLink = new ArrayList<>();
 										apis.put(rawMessage[2], typedLink);
@@ -270,36 +292,12 @@ public final class SakuraExPlug extends JavaPlugin {
 						}
 						break;
 					}
-					case "/op": {
-						MessageChainBuilder mcb = new MessageChainBuilder();
-						if (rawMessage.length > 1) {
-							try {
-								long qqNumber = Long.parseLong(rawMessage[1]);
-								Utils.addQQ(sender, mcb, qqNumber);
-							} catch (NumberFormatException e) {
-								sender.sendMessage("Please enter right qq number.");
-							}
-						} else {
-							long qqNumber = sender.getId();
-							Utils.addQQ(sender, mcb, qqNumber);
-						}
+					case "/op":
+						new OpCommand(event).react();
 						break;
-					}
-					case "/deop": {
-						MessageChainBuilder mcb = new MessageChainBuilder();
-						if (rawMessage.length > 1) {
-							try {
-								long qqNumber = Long.parseLong(rawMessage[1]);
-								Utils.removeQQ(sender, mcb, qqNumber);
-							} catch (NumberFormatException e) {
-								sender.sendMessage("Please enter right qq number.");
-							}
-						} else {
-							long qqNumber = sender.getId();
-							Utils.removeQQ(sender, mcb, qqNumber);
-						}
+					case "/deop":
+						new DeOpCommand(event).react();
 						break;
-					}
 					default:
 						sender.sendMessage("Try using /help to learn what can I do.");
 				}
