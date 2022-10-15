@@ -30,7 +30,7 @@
 | /deop \[qq number\]                      | 与 /op 作用相反                        |
 | /check \[info\]                          | 查看对应配置文件信息，留空表示查看信息类别             |
 | /img add \<type\> \<api link\>           | 往对应类别 API 库中添加一个 API。若类别不存在，则自动创建 |
-| /img remove \<type\> \<api link\>        | 删除对应 API 库中对用的 API                |
+| /img remove \<type\> \[api link\]        | 删除对应 API 库中对用的 API，留空表示删除类别       |
 | /group add \<group id\> \[qq number\]    | 给予某 qq 群特定成员所有群指令权限，留空 qq 表示所有群成员 |
 | /group remove \<group id\> \[qq number\] | 剥夺某 qq 群特定成员所有群指令权限，留空 qq 表示所有群成员 |
 
