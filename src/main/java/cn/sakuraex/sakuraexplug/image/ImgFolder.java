@@ -10,30 +10,24 @@ import java.util.Map;
 public class ImgFolder {
 	
 	public static void createImgFolder(File imgFolder, MiraiLogger logger) {
-		//总图片缓冲区
-		if (createFolder(imgFolder)) {
+		if (folderCreated(imgFolder)) {
 			logger.info("ImgFolder: " + imgFolder.getPath());
 		} else {
 			logger.info("Create ImgFolder: " + imgFolder.getPath());
 		}
-		//图片分类文件夹
 		for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
 			extendFolder(imgFolder, entry.getKey(), logger);
 		}
 	}
 	
-	private static boolean createFolder(File folder) {
-		if (folder.exists()) {
-			return true;
-		} else {
-			return !folder.mkdirs();
-		}
+	private static boolean folderCreated(File folder) {
+		return folder.exists();
 	}
 	
 	private static void extendFolder(File folder, String name, MiraiLogger logger) {
 		File nextFolder = new File(folder, name);
 		String tips = capitalizeFirstLetter(name) + "Folder: " + nextFolder.getPath();
-		if (createFolder(nextFolder)) {
+		if (folderCreated(nextFolder)) {
 			logger.info(tips);
 		} else {
 			logger.info("Create " + tips);

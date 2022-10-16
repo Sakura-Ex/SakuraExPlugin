@@ -1,6 +1,6 @@
 package cn.sakuraex.sakuraexplug.command.commands.friend;
 
-import cn.sakuraex.sakuraexplug.command.SingleArgFriendCommand;
+import cn.sakuraex.sakuraexplug.command.commands.SingleArgFriendCommand;
 import cn.sakuraex.sakuraexplug.config.Config;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
@@ -10,12 +10,16 @@ public final class OpCommand extends SingleArgFriendCommand {
 	private static final String argName = "qq number";
 	public static final OpCommand INSTANCE = new OpCommand();
 	
+	static {
+		INSTANCE.argCanOmit();
+	}
+	
 	private OpCommand() {
-		super(argName, true);
+		super(argName);
 	}
 	
 	public OpCommand(FriendMessageEvent event) {
-		super(event, argName, true);
+		super(event, argName);
 	}
 	
 	@Override
@@ -26,16 +30,16 @@ public final class OpCommand extends SingleArgFriendCommand {
 	@Override
 	public void react() {
 		MessageChainBuilder mcb = new MessageChainBuilder();
-		if (getArg().equals("")) {
-			long qqNumber = getContact().getId();
-			addQQ(getContact(), mcb, qqNumber);
-		} else {
+		if (hasArg()) {
 			try {
 				long qqNumber = Long.parseLong(getArg());
 				addQQ(getContact(), mcb, qqNumber);
 			} catch (NumberFormatException e) {
 				getContact().sendMessage("Please enter right qq number.");
 			}
+		} else {
+			long qqNumber = getContact().getId();
+			addQQ(getContact(), mcb, qqNumber);
 		}
 	}
 	

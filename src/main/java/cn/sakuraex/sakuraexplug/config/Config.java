@@ -1,6 +1,5 @@
 package cn.sakuraex.sakuraexplug.config;
 
-import cn.sakuraex.sakuraexplug.image.ImageKind;
 import net.mamoe.mirai.console.data.Value;
 import net.mamoe.mirai.console.data.java.JavaAutoSavePluginConfig;
 
@@ -19,7 +18,7 @@ public final class Config extends JavaAutoSavePluginConfig {
 	public final Value<Map<String, List<String>>> imageAPIs = typedValue("imageAPIs",
 			createKType(Map.class, createKType(String.class), createKType(List.class, createKType(String.class))),
 			new HashMap<String, List<String>>() {{
-				for (ImageKind kind : ImageKind.values()) {
+				for (Default.DefaultImageKind kind : Default.DefaultImageKind.values()) {
 					put(kind.getName(), new ArrayList<String>() {{
 						add(kind.getURL());
 					}});

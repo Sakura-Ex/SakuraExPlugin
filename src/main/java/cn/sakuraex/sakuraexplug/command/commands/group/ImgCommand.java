@@ -20,9 +20,13 @@ import java.util.List;
 import java.util.Map;
 
 public final class ImgCommand extends SingleArgGroupCommand {
-	private static final String argName = "type";
 	public static final ImgCommand INSTANCE = new ImgCommand();
-	public final String name = "/img";
+	private static final String argName = "type";
+
+	static {
+		INSTANCE.argCanOmit();
+	}
+	
 	private File imageFolder;
 	private long timeFlag;
 	private String thisArg;
@@ -39,11 +43,11 @@ public final class ImgCommand extends SingleArgGroupCommand {
 	
 	@Override
 	public String getName() {
-		return this.name;
+		return "/img";
 	}
 	
 	public long getTimeFlag() {
-		return timeFlag;
+		return this.timeFlag;
 	}
 	
 	public void send() {
@@ -81,11 +85,13 @@ public final class ImgCommand extends SingleArgGroupCommand {
 	
 	@Override
 	public void detailedHelp() {
-		MessageChainBuilder mcb = new MessageChainBuilder().append("Usage: /img <type>\n").append("Where the <type> can be:\n");
+		MessageChainBuilder mcb = new MessageChainBuilder().append("Usage: ").append(usageHelp()).append("\n");
+		mcb.append(argName).append(" :\n");
 		for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
 			mcb.append("- ").append(entry.getKey()).append("\n");
 		}
-		getContact().sendMessage(mcb.append("- random\n").asMessageChain());
+		mcb.append("- random\n");
+		getContact().sendMessage(mcb.append("Omit the type to show detailed usage.").asMessageChain());
 	}
 	
 	@Override
@@ -94,7 +100,7 @@ public final class ImgCommand extends SingleArgGroupCommand {
 		Group group = getContact();
 		OnlineMessageSource source = getSource();
 		boolean canDo = false;
-		if (getRawMessage().length > 1) {
+		if (hasArg()) {
 			for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
 				canDo = canDo || getArg().equals(entry.getKey());
 			}
@@ -114,6 +120,7 @@ public final class ImgCommand extends SingleArgGroupCommand {
 				group.sendMessage(mcb.asMessageChain());
 			}
 		} else {
+			argCanOmit();
 			detailedHelp();
 		}
 	}
