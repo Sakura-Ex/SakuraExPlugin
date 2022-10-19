@@ -5,6 +5,9 @@ import net.mamoe.mirai.contact.User;
 import net.mamoe.mirai.message.data.OnlineMessageSource;
 
 public abstract class NoArgCommand<T extends Contact> extends AbstractCommand<T> {
+	
+	private String usageHelpInfo = "";
+	
 	protected NoArgCommand() {
 	}
 	
@@ -14,6 +17,10 @@ public abstract class NoArgCommand<T extends Contact> extends AbstractCommand<T>
 	
 	@Override
 	public String usageHelp() {
-		return getName();
+		return getName() + (usageHelpInfo.equals("") ? "" : " # " + this.usageHelpInfo);
+	}
+	
+	protected void setInfo(String info) {
+		this.usageHelpInfo = info;
 	}
 }

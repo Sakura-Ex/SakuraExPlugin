@@ -4,6 +4,7 @@ import cn.sakuraex.sakuraexplug.command.AbstractCommand;
 import cn.sakuraex.sakuraexplug.command.commands.HelpCommand;
 import cn.sakuraex.sakuraexplug.command.commands.friend.*;
 import cn.sakuraex.sakuraexplug.command.commands.group.CalcCommand;
+import cn.sakuraex.sakuraexplug.command.commands.group.GitHubCommand;
 import cn.sakuraex.sakuraexplug.command.commands.group.ImgCommand;
 import cn.sakuraex.sakuraexplug.command.commands.group.RandMuteCommand;
 import cn.sakuraex.sakuraexplug.config.Config;
@@ -22,6 +23,7 @@ import net.mamoe.mirai.event.GlobalEventChannel;
 import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
+import net.mamoe.mirai.event.events.MemberJoinEvent;
 import net.mamoe.mirai.utils.MiraiLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,7 +39,7 @@ public final class SakuraExPlug extends JavaPlugin {
 	private long imgCommandTimeFlag = 0;
 	
 	private SakuraExPlug() {
-		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.2.0")
+		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.2.1")
 				.name("SakuraExPluginQQ")
 				.author("SakuraEx")
 				.info("SakuraEx's assistant")
@@ -63,6 +65,7 @@ public final class SakuraExPlug extends JavaPlugin {
 			add(ImgCommand.INSTANCE);
 			//add(CalcCommand.INSTANCE);
 			add(RandMuteCommand.INSTANCE);
+			add(GitHubCommand.INSTANCE);
 		}};
 		
 		List<AbstractCommand<Friend>> friendCommands = new ArrayList<AbstractCommand<Friend>>() {{
@@ -85,8 +88,8 @@ public final class SakuraExPlug extends JavaPlugin {
 			@EventHandler
 			public void onMessage(GroupMessageEvent event) {
 				if (Utils.hasPermission(event)) {
-					String commandType = event.getMessage().contentToString().split(" ")[0];
-					switch (commandType) {
+					String commandName = event.getMessage().contentToString().split(" ")[0];
+					switch (commandName) {
 						case "/img":
 							ImgCommand imgCommand = new ImgCommand(event, imgFolder, imgCommandTimeFlag);
 							imgCommand.react();
@@ -98,6 +101,9 @@ public final class SakuraExPlug extends JavaPlugin {
 						case "/randmute":
 							AbstractCommand.react(new RandMuteCommand(event));
 							break;
+						case "/github":
+							AbstractCommand.react(new GitHubCommand(event));
+							break;
 						case "/help":
 							AbstractCommand.react(new HelpCommand<>(event, groupCommands));
 							break;
@@ -107,9 +113,8 @@ public final class SakuraExPlug extends JavaPlugin {
 			
 			@EventHandler
 			public void onMessage(FriendMessageEvent event) {
-				String[] rawMessage = event.getMessage().contentToString().split(" ");
-				Friend sender = event.getSender();
-				switch (rawMessage[0]) {
+				String commandName = event.getMessage().contentToString().split(" ")[0];
+				switch (commandName) {
 					case "/help":
 						AbstractCommand.react(new HelpCommand<>(event, friendCommands));
 						break;
@@ -135,8 +140,13 @@ public final class SakuraExPlug extends JavaPlugin {
 						AbstractCommand.react(new DeOpCommand(event));
 						break;
 					default:
-						sender.sendMessage("Try using /help to learn what can I do.");
+						event.getSender().sendMessage("Try using /help to learn what can I do.");
 				}
+			}
+			
+			@EventHandler
+			public void onJoin(MemberJoinEvent event) {
+			
 			}
 		});
 	}

@@ -19,6 +19,10 @@ public final class RandMuteCommand extends NoArgGroupCommand {
 		super(event);
 	}
 	
+	{
+		setInfo("Randomly mute yourself from 1 to 3600 seconds.");
+	}
+	
 	@Override
 	public String getName() {
 		return "/randmute";
@@ -35,10 +39,5 @@ public final class RandMuteCommand extends NoArgGroupCommand {
 			mcb.append(" You are the superior, I couldn't mute you.");
 		}
 		getContact().sendMessage(mcb.asMessageChain());
-	}
-	
-	@Override
-	public String usageHelp() {
-		return getName() + " # Randomly mute yourself from 1 to 3600 seconds.";
 	}
 }

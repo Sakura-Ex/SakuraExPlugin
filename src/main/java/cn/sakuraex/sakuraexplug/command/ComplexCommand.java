@@ -86,7 +86,7 @@ public abstract class ComplexCommand<T extends Contact> extends AbstractCommand<
 	}
 	
 	protected String getArg(int index) {
-		return this.args[Math.max(Math.min(0, index), this.argLength - 1)];
+		return this.args[Math.min(Math.max(0, index), this.argLength - 1)];
 	}
 	
 	protected String getArg(String argName) {
