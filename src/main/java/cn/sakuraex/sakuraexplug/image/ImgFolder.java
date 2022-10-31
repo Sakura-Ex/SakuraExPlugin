@@ -4,8 +4,6 @@ import cn.sakuraex.sakuraexplug.config.Config;
 import net.mamoe.mirai.utils.MiraiLogger;
 
 import java.io.File;
-import java.util.List;
-import java.util.Map;
 
 public class ImgFolder {
 	
@@ -15,8 +13,8 @@ public class ImgFolder {
 		} else {
 			logger.info("Create ImgFolder: " + imgFolder.getPath());
 		}
-		for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
-			extendFolder(imgFolder, entry.getKey(), logger);
+		for (String type : Config.INSTANCE.imageAPIs.get().keySet()) {
+			extendFolder(imgFolder, type, logger);
 		}
 	}
 	

@@ -7,8 +7,8 @@ import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.utils.MiraiLogger;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class ImgRemoveCommand extends ComplexFriendCommand {
 	
@@ -16,10 +16,6 @@ public final class ImgRemoveCommand extends ComplexFriendCommand {
 	public static final ImgRemoveCommand INSTANCE = new ImgRemoveCommand();
 	private File imgFolder;
 	private MiraiLogger logger;
-	
-	static {
-		INSTANCE.argCanOmit();
-	}
 	
 	private ImgRemoveCommand() {
 		super(argNames);
@@ -38,7 +34,7 @@ public final class ImgRemoveCommand extends ComplexFriendCommand {
 	
 	@Override
 	public void react() {
-		Map<String, List<String>> apis = Config.INSTANCE.imageAPIs.get();
+		Map<String, Set<String>> apis = Config.INSTANCE.imageAPIs.get();
 		if (getArgLength() > 1) {
 			if (apis.containsKey(getArg(0))) {
 				if (apis.get(getArg(0)).size() > 1) {
@@ -51,7 +47,7 @@ public final class ImgRemoveCommand extends ComplexFriendCommand {
 					getContact().sendMessage("You can't remove the last api.");
 				}
 			} else {
-				getContact().sendMessage("Type value " + getArg(0) + " does not exist.");
+				getContact().sendMessage("Type " + getArg(0) + " does not exist.");
 			}
 		} else if (getArgLength() == 1) {
 			if (apis.containsKey(getArg(0))) {
@@ -66,15 +62,15 @@ public final class ImgRemoveCommand extends ComplexFriendCommand {
 						}
 					}
 					if (delete.delete() && isDeleted) {
-						logger.info("Delete type folder successfully.");
+						logger.info("Delete type's folder successfully.");
 					} else {
-						logger.info("Type folder deletion failed.");
+						logger.info("Failed to delete type's folder..");
 					}
 				} else {
 					getContact().sendMessage("You can't remove the last type.");
 				}
 			} else {
-				getContact().sendMessage("Type value " + getArg(0) + " does not exist.");
+				getContact().sendMessage("Type " + getArg(0) + " does not exist.");
 			}
 		} else {
 			detailedHelp();

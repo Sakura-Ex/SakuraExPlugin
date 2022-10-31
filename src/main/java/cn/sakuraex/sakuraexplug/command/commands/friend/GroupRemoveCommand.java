@@ -5,8 +5,8 @@ import cn.sakuraex.sakuraexplug.config.Config;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class GroupRemoveCommand extends ComplexFriendCommand {
 	
@@ -43,7 +43,7 @@ public final class GroupRemoveCommand extends ComplexFriendCommand {
 	@Override
 	public void react() {
 		MessageChainBuilder mcb = new MessageChainBuilder();
-		Map<Long, List<Long>> whiteGroupList = Config.INSTANCE.whitelist.get();
+		Map<Long, Set<Long>> whiteGroupList = Config.INSTANCE.whitelist.get();
 		if (getArgLength() > 0) {
 			long groupNumber;
 			try {
@@ -52,7 +52,7 @@ public final class GroupRemoveCommand extends ComplexFriendCommand {
 					try {
 						long qqNumber = Long.parseLong(getArg(1));
 						if (whiteGroupList.containsKey(groupNumber)) {
-							List<Long> qqNumberList = whiteGroupList.get(groupNumber);
+							Set<Long> qqNumberList = whiteGroupList.get(groupNumber);
 							if (qqNumberList.remove(qqNumber)) {
 								mcb.append("Remove member ").append(String.valueOf(qqNumber)).append(" from group ")
 										.append(String.valueOf(groupNumber)).append(" successfully.");

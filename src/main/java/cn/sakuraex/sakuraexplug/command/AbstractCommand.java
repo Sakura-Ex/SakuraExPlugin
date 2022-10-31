@@ -49,8 +49,6 @@ public abstract class AbstractCommand<T extends Contact> implements ICommand {
 		} else if (contact instanceof Group) {
 			MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(getSource(), (Member) getUser());
 			getContact().sendMessage(mcb.append(str).asMessageChain());
-		} else {
-			react();
 		}
 	}
 	
@@ -62,8 +60,6 @@ public abstract class AbstractCommand<T extends Contact> implements ICommand {
 		} else if (contact instanceof Group) {
 			MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(getSource(), (Member) getUser());
 			getContact().sendMessage(mcb.append(str).asMessageChain());
-		} else {
-			detailedHelp();
 		}
 	}
 }

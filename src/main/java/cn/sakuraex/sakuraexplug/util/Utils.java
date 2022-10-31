@@ -11,8 +11,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Utils {
 	public static String downloadImage(URL url, String imagePath, int tryCount) {
@@ -36,14 +36,13 @@ public class Utils {
 	}
 	
 	public static boolean hasPermission(GroupMessageEvent event) {
-		Map<Long, List<Long>> whitelist = Config.INSTANCE.whitelist.get();
+		Map<Long, Set<Long>> whitelist = Config.INSTANCE.whitelist.get();
 		Member sender = event.getSender();
 		Group group = event.getGroup();
-		boolean hasMember = Config.INSTANCE.whiteQQList.get().contains(sender.getId());
-		if (whitelist.containsKey(group.getId())) {
-			hasMember = hasMember || whitelist.get(event.getGroup().getId()).isEmpty();
-			hasMember = hasMember || whitelist.get(group.getId()).contains(sender.getId());
+		boolean has = Config.INSTANCE.whiteQQList.get().contains(sender.getId());
+		if (!has && whitelist.containsKey(group.getId())) {
+			has = whitelist.get(event.getGroup().getId()).isEmpty() || whitelist.get(group.getId()).contains(sender.getId());
 		}
-		return hasMember;
+		return has;
 	}
 }

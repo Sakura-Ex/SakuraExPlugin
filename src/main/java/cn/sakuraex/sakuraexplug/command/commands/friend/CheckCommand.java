@@ -5,8 +5,8 @@ import cn.sakuraex.sakuraexplug.config.Config;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class CheckCommand extends SingleArgFriendCommand {
 	private static final String argName = "info";
@@ -35,7 +35,7 @@ public final class CheckCommand extends SingleArgFriendCommand {
 			switch (getArg()) {
 				case "imageAPIs": {
 					MessageChainBuilder mcb = new MessageChainBuilder().append("imageAPIs:\n");
-					for (Map.Entry<String, List<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
+					for (Map.Entry<String, Set<String>> entry : Config.INSTANCE.imageAPIs.get().entrySet()) {
 						mcb.append("\t-").append(entry.getKey()).append("\n");
 						for (String api : entry.getValue()) {
 							mcb.append("\t\t-").append(api).append("\n");
@@ -46,13 +46,13 @@ public final class CheckCommand extends SingleArgFriendCommand {
 				}
 				case "whitelist": {
 					MessageChainBuilder mcb = new MessageChainBuilder().append("whitelist:\n");
-					for (Map.Entry<Long, List<Long>> entry : Config.INSTANCE.whitelist.get().entrySet()) {
+					for (Map.Entry<Long, Set<Long>> entry : Config.INSTANCE.whitelist.get().entrySet()) {
 						mcb.append("\t-").append(entry.getKey().toString()).append("\n");
 						if (entry.getValue().isEmpty()) {
 							mcb.append("\t\t-all\n");
 						} else {
 							for (long qqNumber : entry.getValue()) {
-								mcb.append("\t\t-").append(Long.toString(qqNumber)).append("\n");
+								mcb.append("\t\t-").append(String.valueOf(qqNumber)).append("\n");
 							}
 						}
 					}

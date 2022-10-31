@@ -5,9 +5,9 @@ import cn.sakuraex.sakuraexplug.config.Config;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public final class GroupAddCommand extends ComplexFriendCommand {
 	
@@ -48,15 +48,14 @@ public final class GroupAddCommand extends ComplexFriendCommand {
 		if (getArgLength() > 0) {
 			try {
 				groupNumber = Long.parseLong(getArg(0));
-				Map<Long, List<Long>> whiteGroupList = Config.INSTANCE.whitelist.get();
+				Map<Long, Set<Long>> whiteGroupList = Config.INSTANCE.whitelist.get();
 				if (getArgLength() > 1) {
 					try {
 						long qqNumber = Long.parseLong(getArg(1));
 						if (whiteGroupList.containsKey(groupNumber)) {
-							List<Long> qqNumberList = whiteGroupList.get(groupNumber);
-							qqNumberList.add(qqNumber);
+							whiteGroupList.get(groupNumber).add(qqNumber);
 						} else {
-							whiteGroupList.put(groupNumber, new ArrayList<Long>() {{
+							whiteGroupList.put(groupNumber, new TreeSet<Long>() {{
 								add(qqNumber);
 							}});
 						}
@@ -67,7 +66,7 @@ public final class GroupAddCommand extends ComplexFriendCommand {
 						getContact().sendMessage("Please enter right qq number.");
 					}
 				} else {
-					whiteGroupList.put(groupNumber, new ArrayList<>());
+					whiteGroupList.put(groupNumber, new TreeSet<>());
 					getContact().sendMessage("Add group " + groupNumber + " successfully.");
 				}
 			} catch (NumberFormatException e) {

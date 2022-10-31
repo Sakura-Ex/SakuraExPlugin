@@ -39,7 +39,7 @@ public final class SakuraExPlug extends JavaPlugin {
 	private long imgCommandTimeFlag = 0;
 	
 	private SakuraExPlug() {
-		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.2.1")
+		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.2.2")
 				.name("SakuraExPluginQQ")
 				.author("SakuraEx")
 				.info("SakuraEx's assistant")
@@ -141,6 +141,7 @@ public final class SakuraExPlug extends JavaPlugin {
 						break;
 					default:
 						event.getSender().sendMessage("Try using /help to learn what can I do.");
+						break;
 				}
 			}
 			

@@ -10,9 +10,9 @@ import net.mamoe.mirai.utils.MiraiLogger;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public final class ImgAddCommand extends ComplexFriendCommand {
 	
@@ -47,14 +47,12 @@ public final class ImgAddCommand extends ComplexFriendCommand {
 	@Override
 	public void react() {
 		if (getArgLength() > 1) {
-			Map<String, List<String>> apis = Config.INSTANCE.imageAPIs.get();
-			List<String> typedLink;
-			if (apis.containsKey(getArg(0))) {
-				typedLink = apis.get(getArg(0));
-			} else {
+			Map<String, Set<String>> apis = Config.INSTANCE.imageAPIs.get();
+			Set<String> typedLink;
+			if (!apis.containsKey(getArg(0))) {
 				try {
 					new URL(getArg(1));
-					typedLink = new ArrayList<>();
+					typedLink = new TreeSet<>();
 					apis.put(getArg(0), typedLink);
 					ImgFolder.createImgFolder(imgFolder, logger);
 				} catch (MalformedURLException e) {
@@ -62,11 +60,10 @@ public final class ImgAddCommand extends ComplexFriendCommand {
 					return;
 				}
 			}
-			if (typedLink.contains(getArg(1))) {
-				getContact().sendMessage("Api Link " + getArg(1) + " is already in the imageAPIs.");
-			} else {
-				apis.get(getArg(0)).add(getArg(1));
+			if (apis.get(getArg(0)).add(getArg(1))) {
 				getContact().sendMessage("Add api Link " + getArg(1) + " successfully.");
+			} else {
+				getContact().sendMessage("Api Link " + getArg(1) + " is already in the imageAPIs.");
 			}
 		} else {
 			detailedHelp();
