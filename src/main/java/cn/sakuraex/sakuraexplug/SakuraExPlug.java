@@ -36,7 +36,7 @@ public final class SakuraExPlug extends JavaPlugin {
 	private long imgCommandTimeFlag = 0;
 	
 	private SakuraExPlug() {
-		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.3.0")
+		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.3.1")
 				.name("SakuraExPluginQQ")
 				.author("SakuraEx")
 				.info("SakuraEx's assistant")
