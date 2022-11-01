@@ -51,7 +51,10 @@ public class CompCommand extends ComputeCommand {
 			}
 			try {
 				BigDecimal result = calc(resolveExpr(transformExp(expression.toString())));
-				String message = String.valueOf(result);
+				String message = result.setScale(32, RoundingMode.HALF_UP).toString().replaceAll("0*$", "");
+				if (message.endsWith(".")) {
+					message = message.replace(".", "");
+				}
 				mcb.append(String.valueOf(expression)).append("=");
 				mcb.append(message);
 			} catch (ArithmeticException e) {
