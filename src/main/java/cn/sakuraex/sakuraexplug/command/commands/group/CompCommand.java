@@ -7,28 +7,28 @@ import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-public final class CalcCommand extends ComputeCommand {
-	
+public class CompCommand extends ComputeCommand {
 	private static final String argName = "expression";
-	public static final CalcCommand INSTANCE = new CalcCommand(argName);
-	
-	private CalcCommand(String argName) {
-		super(argName);
-	}
-	
-	public CalcCommand(GroupMessageEvent event) {
-		super(event, argName);
-	}
+	public static final CompCommand INSTANCE = new CompCommand(argName);
 	
 	@Override
 	public String getName() {
-		return "/calc";
+		return "/comp";
+	}
+	
+	private CompCommand(String argName) {
+		super(argName);
+	}
+	
+	public CompCommand(GroupMessageEvent event) {
+		super(event, argName);
 	}
 	
 	@Override
@@ -36,7 +36,7 @@ public final class CalcCommand extends ComputeCommand {
 		MessageChainBuilder mcb = new MessageChainBuilder().append(usageHelp()).append("\n");
 		mcb.append("expression: 你要计算的表达式\n");
 		mcb.append("*目前仅支持四则及幂运算*\n");
-		mcb.append("*方法采用浮点数运算，高精度请使用 /comp*");
+		mcb.append("*幂大小必须小于").append(String.valueOf(Integer.MAX_VALUE)).append("且为整数*");
 		getContact().sendMessage(mcb.asMessageChain());
 	}
 	
@@ -50,15 +50,8 @@ public final class CalcCommand extends ComputeCommand {
 				expression.append(raw[i]);
 			}
 			try {
-				double temp = calc(resolveExpr(transformExp(expression.toString())));
-				if (Double.isNaN(temp)) {
-					throw new ArithmeticException();
-				}
-				BigDecimal result = BigDecimal.valueOf(temp);
-				String message = String.valueOf(result.setScale(7, RoundingMode.HALF_UP)).replaceAll("0*$", "");
-				if (message.endsWith(".")) {
-					message = message.substring(0, message.length() - 1);
-				}
+				BigDecimal result = calc(resolveExpr(transformExp(expression.toString())));
+				String message = String.valueOf(result);
 				mcb.append(String.valueOf(expression)).append("=");
 				mcb.append(message);
 			} catch (ArithmeticException e) {
@@ -79,14 +72,14 @@ public final class CalcCommand extends ComputeCommand {
 	 *
 	 * @return 计算结果
 	 */
-	private double calcE(List<String> exp) {
+	private BigDecimal calcE(List<String> exp) {
 		List<String> process = new LinkedList<>(exp);
 		//计算乘方
 		for (int i = 0; i < process.size(); i++) {
 			String p = process.get(i);
 			if (p.equals("^")) {
-				double temp;
-				temp = Math.pow(Double.parseDouble(process.get(i - 1)), Double.parseDouble(process.get(i + 1)));
+				BigDecimal temp;
+				temp = new BigDecimal(process.get(i - 1)).pow(Integer.parseInt(process.get(i + 1)));
 				process.remove(i - 1);
 				process.remove(i - 1);
 				process.set(i - 1, String.valueOf(temp));
@@ -97,11 +90,11 @@ public final class CalcCommand extends ComputeCommand {
 		for (int i = 0; i < process.size(); i++) {
 			String p = process.get(i);
 			if (p.matches("[*/]")) {
-				double temp;
+				BigDecimal temp;
 				if (p.equals("*")) {
-					temp = Double.parseDouble(process.get(i - 1)) * Double.parseDouble(process.get(i + 1));
+					temp = new BigDecimal(process.get(i - 1)).multiply(new BigDecimal(process.get(i + 1)));
 				} else {
-					temp = Double.parseDouble(process.get(i - 1)) / Double.parseDouble(process.get(i + 1));
+					temp = new BigDecimal(process.get(i - 1)).divide(new BigDecimal(process.get(i + 1)), new MathContext(64, RoundingMode.HALF_UP));
 				}
 				process.remove(i - 1);
 				process.remove(i - 1);
@@ -110,12 +103,12 @@ public final class CalcCommand extends ComputeCommand {
 			}
 		}
 		//计算加减
-		double result = Double.parseDouble(process.get(0));
+		BigDecimal result = new BigDecimal(process.get(0));
 		for (int i = 1; i < process.size() - 1; i += 2) {
 			if (process.get(i).equals("+")) {
-				result += Double.parseDouble(process.get(i + 1));
+				result = result.add(new BigDecimal(process.get(i + 1)));
 			} else if (process.get(i).equals("-")) {
-				result -= Double.parseDouble(process.get(i + 1));
+				result = result.subtract(new BigDecimal(process.get(i + 1)));
 			}
 		}
 		return result;
@@ -126,7 +119,7 @@ public final class CalcCommand extends ComputeCommand {
 	 *
 	 * @return 计算结果
 	 */
-	private double calc(List<String> exp) {
+	private BigDecimal calc(List<String> exp) {
 		List<String> next = new ArrayList<>();
 		List<String> nextExp = new ArrayList<>();
 		Stack<String> brackets = new Stack<>();

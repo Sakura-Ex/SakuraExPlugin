@@ -8,6 +8,10 @@ import net.mamoe.mirai.message.data.QuoteReply;
 
 public class MessageUtil {
 	public static MessageChainBuilder groupQuoteAndAtMCB(OnlineMessageSource source, Member sender) {
-		return new MessageChainBuilder().append(new QuoteReply(source)).append(new At(sender.getId()));
+		return new MessageChainBuilder().append(new QuoteReply(source)).append(new At(sender.getId())).append(" ");
+	}
+	
+	public static String trimAllSpace(String str) {
+		return str.replaceAll("\\s", "");
 	}
 }

@@ -104,7 +104,6 @@ public final class ImgCommand extends SingleArgGroupCommand {
 				getContact().sendMessage(mcb.asMessageChain());
 			}
 		} else {
-			argCanOmit();
 			detailedHelp();
 		}
 	}
