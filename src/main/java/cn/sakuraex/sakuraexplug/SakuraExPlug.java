@@ -3,10 +3,7 @@ package cn.sakuraex.sakuraexplug;
 import cn.sakuraex.sakuraexplug.command.AbstractCommand;
 import cn.sakuraex.sakuraexplug.command.commands.HelpCommand;
 import cn.sakuraex.sakuraexplug.command.commands.friend.*;
-import cn.sakuraex.sakuraexplug.command.commands.group.CalcCommand;
-import cn.sakuraex.sakuraexplug.command.commands.group.GitHubCommand;
-import cn.sakuraex.sakuraexplug.command.commands.group.ImgCommand;
-import cn.sakuraex.sakuraexplug.command.commands.group.RandMuteCommand;
+import cn.sakuraex.sakuraexplug.command.commands.group.*;
 import cn.sakuraex.sakuraexplug.config.Config;
 import cn.sakuraex.sakuraexplug.image.ImgFolder;
 import cn.sakuraex.sakuraexplug.util.Utils;
@@ -39,7 +36,7 @@ public final class SakuraExPlug extends JavaPlugin {
 	private long imgCommandTimeFlag = 0;
 	
 	private SakuraExPlug() {
-		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.2.2")
+		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.3.0")
 				.name("SakuraExPluginQQ")
 				.author("SakuraEx")
 				.info("SakuraEx's assistant")
@@ -63,7 +60,8 @@ public final class SakuraExPlug extends JavaPlugin {
 		// Storage command types.
 		List<AbstractCommand<Group>> groupCommands = new ArrayList<AbstractCommand<Group>>() {{
 			add(ImgCommand.INSTANCE);
-			//add(CalcCommand.INSTANCE);
+			add(CalcCommand.INSTANCE);
+			add(CompCommand.INSTANCE);
 			add(RandMuteCommand.INSTANCE);
 			add(GitHubCommand.INSTANCE);
 		}};
@@ -97,6 +95,9 @@ public final class SakuraExPlug extends JavaPlugin {
 							break;
 						case "/calc":
 							AbstractCommand.react(new CalcCommand(event));
+							break;
+						case "/comp":
+							AbstractCommand.react(new CompCommand(event));
 							break;
 						case "/randmute":
 							AbstractCommand.react(new RandMuteCommand(event));
