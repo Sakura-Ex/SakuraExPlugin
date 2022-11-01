@@ -43,7 +43,7 @@ public abstract class AbstractCommand<T extends Contact> implements ICommand {
 	
 	@Override
 	public void react() {
-		String str = "This method might be realized one day.";
+		String str = "这个方法将来可能实现。";
 		if (contact instanceof Friend) {
 			getContact().sendMessage(str);
 		} else if (contact instanceof Group) {
@@ -54,7 +54,7 @@ public abstract class AbstractCommand<T extends Contact> implements ICommand {
 	
 	@Override
 	public void detailedHelp() {
-		String str = "This method hasn't had help info yet.";
+		String str = "这个方法还没有帮助信息。";
 		if (contact instanceof Friend) {
 			getContact().sendMessage(str);
 		} else if (contact instanceof Group) {

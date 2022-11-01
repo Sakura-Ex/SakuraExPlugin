@@ -35,7 +35,7 @@ public final class OpCommand extends SingleArgFriendCommand {
 				long qqNumber = Long.parseLong(getArg());
 				addQQ(getContact(), mcb, qqNumber);
 			} catch (NumberFormatException e) {
-				getContact().sendMessage("Please enter right qq number.");
+				getContact().sendMessage("请输入正确的 qq 号");
 			}
 		} else {
 			long qqNumber = getContact().getId();
@@ -46,10 +46,10 @@ public final class OpCommand extends SingleArgFriendCommand {
 	private void addQQ(Friend sender, MessageChainBuilder mcb, long qqNumber) {
 		if (!Config.INSTANCE.whiteQQList.get().contains(qqNumber)) {
 			Config.INSTANCE.whiteQQList.get().add(qqNumber);
-			mcb.append("Add ").append(Long.toString(qqNumber)).append(" successfully.");
+			mcb.append("添加 ").append(Long.toString(qqNumber)).append(" 成功");
 			sender.sendMessage(mcb.asMessageChain());
 		} else {
-			MessageChainBuilder fail = new MessageChainBuilder().append(Long.toString(qqNumber)).append(" is already in whiteQQList.");
+			MessageChainBuilder fail = new MessageChainBuilder().append(Long.toString(qqNumber)).append(" 已被添加");
 			sender.sendMessage(fail.asMessageChain());
 		}
 	}

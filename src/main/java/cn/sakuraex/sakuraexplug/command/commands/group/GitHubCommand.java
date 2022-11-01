@@ -14,7 +14,7 @@ public final class GitHubCommand extends NoArgGroupCommand {
 	}
 	
 	{
-		setInfo("GitHub repository link.");
+		setInfo("项目地址");
 	}
 	
 	@Override

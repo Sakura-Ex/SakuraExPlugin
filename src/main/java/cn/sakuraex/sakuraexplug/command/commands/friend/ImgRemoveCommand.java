@@ -39,15 +39,15 @@ public final class ImgRemoveCommand extends ComplexFriendCommand {
 			if (apis.containsKey(getArg(0))) {
 				if (apis.get(getArg(0)).size() > 1) {
 					if (apis.get(getArg(0)).remove(getArg(1))) {
-						getContact().sendMessage("Remove api Link " + getArg(1) + " successfully.");
+						getContact().sendMessage("移除 api 链接 " + getArg(1) + " 成功");
 					} else {
-						getContact().sendMessage("Api Link " + getArg(1) + " does not exist.");
+						getContact().sendMessage("api 链接 " + getArg(1) + " 不存在");
 					}
 				} else {
-					getContact().sendMessage("You can't remove the last api.");
+					getContact().sendMessage("你不能移除最后一个 api");
 				}
 			} else {
-				getContact().sendMessage("Type " + getArg(0) + " does not exist.");
+				getContact().sendMessage("图片类型 " + getArg(0) + " 不存在");
 			}
 		} else if (getArgLength() == 1) {
 			if (apis.containsKey(getArg(0))) {
@@ -62,15 +62,15 @@ public final class ImgRemoveCommand extends ComplexFriendCommand {
 						}
 					}
 					if (delete.delete() && isDeleted) {
-						logger.info("Delete type's folder successfully.");
+						logger.info("删除文件夹成功");
 					} else {
-						logger.info("Failed to delete type's folder..");
+						logger.info("删除文件夹失败");
 					}
 				} else {
-					getContact().sendMessage("You can't remove the last type.");
+					getContact().sendMessage("你不能移除最后一种图片类型");
 				}
 			} else {
-				getContact().sendMessage("Type " + getArg(0) + " does not exist.");
+				getContact().sendMessage("图片类型 " + getArg(0) + " 不存在");
 			}
 		} else {
 			detailedHelp();
@@ -81,9 +81,9 @@ public final class ImgRemoveCommand extends ComplexFriendCommand {
 	public void detailedHelp() {
 		argCanOmit();
 		MessageChainBuilder mcb = new MessageChainBuilder().append(usageHelp()).append("\n");
-		mcb.append("type: The type you want remove api from.\n");
-		mcb.append("api link: A url that you want to remove from the type.\n");
-		mcb.append("Omit the api link to remove the type.");
+		mcb.append("type: 你想移除的图片 api 的类型\n");
+		mcb.append("api link: 你想移除的图片 api\n");
+		mcb.append("省略 <api link> 以移除图片类型");
 		getContact().sendMessage(mcb.asMessageChain());
 	}
 }

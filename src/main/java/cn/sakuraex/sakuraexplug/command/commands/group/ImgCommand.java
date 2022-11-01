@@ -19,10 +19,6 @@ import java.util.List;
 public final class ImgCommand extends SingleArgGroupCommand {
 	public static final ImgCommand INSTANCE = new ImgCommand();
 	private static final String argName = "type";
-
-	static {
-		INSTANCE.argCanOmit();
-	}
 	
 	private File imageFolder;
 	private long timeFlag;
@@ -79,13 +75,13 @@ public final class ImgCommand extends SingleArgGroupCommand {
 	
 	@Override
 	public void detailedHelp() {
-		MessageChainBuilder mcb = new MessageChainBuilder().append("Usage: ").append(usageHelp()).append("\n");
+		MessageChainBuilder mcb = new MessageChainBuilder().append("用法: ").append(usageHelp()).append("\n");
 		mcb.append(argName).append(" :\n");
 		for (String type : Config.INSTANCE.imageAPIs.get().keySet()) {
 			mcb.append("- ").append(type).append("\n");
 		}
-		mcb.append("- random\n");
-		getContact().sendMessage(mcb.append("Omit the type to show detailed usage.").asMessageChain());
+		mcb.append("- random");
+		getContact().sendMessage(mcb.asMessageChain());
 	}
 	
 	@Override
@@ -99,7 +95,7 @@ public final class ImgCommand extends SingleArgGroupCommand {
 				timeFlag = newTime;
 			} else {
 				MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(getSource(), (Member) getUser()).append("\n").append(getName())
-						.append(" 太频繁了，年轻人要节制哦，请冷静一会儿吧\n").append("Left: ")
+						.append(" 太频繁了，年轻人要节制哦，请冷静一会儿吧\n").append("剩余: ")
 						.append(String.valueOf(Config.INSTANCE.imgCD.get() - timeInt)).append(" ms");
 				getContact().sendMessage(mcb.asMessageChain());
 			}

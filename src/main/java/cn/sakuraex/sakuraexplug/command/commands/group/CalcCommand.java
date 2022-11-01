@@ -128,12 +128,12 @@ public final class CalcCommand extends ComputeCommand {
 	 */
 	private double calc(List<String> exp) {
 		List<String> next = new ArrayList<>();
-		List<String> nextExp = new ArrayList<>();
 		Stack<String> brackets = new Stack<>();
 		for (int i = 0; i < exp.size(); i++) {
 			String temp = exp.get(i);
 			// 读取匹配的括号间的表达式
 			if (temp.equals("(")) {
+				List<String> nextExp = new ArrayList<>();
 				for (int j = i; j < exp.size(); j++) {
 					if (exp.get(j).equals(")")) {
 						brackets.pop();

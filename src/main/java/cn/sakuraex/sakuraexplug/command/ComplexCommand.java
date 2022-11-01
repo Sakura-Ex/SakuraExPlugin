@@ -35,11 +35,11 @@ public abstract class ComplexCommand<T extends Contact> extends AbstractCommand<
 	
 	public ComplexCommand(String rawMessage, T contact, User user, OnlineMessageSource source) {
 		super(rawMessage, contact, user, source);
-		argNames = initArgName(getRawMessage().length - 1);
-		argLength = argNames.length;
-		this.args = Arrays.copyOfRange(getRawMessage(), 1, argLength + 1);
-		for (int i = 0; i < argNames.length; i++) {
-			argMap.put(argNames[i], args[i]);
+		this.argNames = initArgName(getRawMessage().length - 1);
+		this.argLength = this.argNames.length;
+		this.args = Arrays.copyOfRange(getRawMessage(), 1, this.argLength + 1);
+		for (int i = 0; i < this.argNames.length; i++) {
+			this.argMap.put(this.argNames[i], this.args[i]);
 		}
 	}
 	
@@ -47,12 +47,12 @@ public abstract class ComplexCommand<T extends Contact> extends AbstractCommand<
 		super(rawMessage, contact, user, source);
 		this.argNames = argNames;
 		this.argLength = getRawMessage().length - 1;
-		this.args = Arrays.copyOfRange(getRawMessage(), 1, argLength + 1);
-		for (int i = 0; i < args.length; i++) {
+		this.args = Arrays.copyOfRange(getRawMessage(), 1, this.argLength + 1);
+		for (int i = 0; i < this.args.length; i++) {
 			if (i < argNames.length) {
-				argMap.put(argNames[i], args[i]);
+				this.argMap.put(argNames[i], this.args[i]);
 			} else {
-				argMap.put("arg" + (i + 1), args[i]);
+				this.argMap.put("arg" + (i + 1), this.args[i]);
 			}
 		}
 	}

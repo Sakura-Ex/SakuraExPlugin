@@ -35,7 +35,7 @@ public final class DeOpCommand extends SingleArgFriendCommand {
 				long qqNumber = Long.parseLong(getArg());
 				removeQQ(getContact(), mcb, qqNumber);
 			} catch (NumberFormatException e) {
-				getContact().sendMessage("Please enter right qq number.");
+				getContact().sendMessage("请输入正确的 qq 号");
 			}
 		} else {
 			long qqNumber = getContact().getId();
@@ -46,10 +46,10 @@ public final class DeOpCommand extends SingleArgFriendCommand {
 	private void removeQQ(Friend sender, MessageChainBuilder mcb, long qqNumber) {
 		if (Config.INSTANCE.whiteQQList.get().contains(qqNumber)) {
 			Config.INSTANCE.whiteQQList.get().remove(qqNumber);
-			mcb.append("Remove ").append(Long.toString(qqNumber)).append(" successfully.");
+			mcb.append("移除 ").append(Long.toString(qqNumber)).append(" 成功");
 			sender.sendMessage(mcb.asMessageChain());
 		} else {
-			MessageChainBuilder fail = new MessageChainBuilder().append(Long.toString(qqNumber)).append(" does not exist in whiteQQList.");
+			MessageChainBuilder fail = new MessageChainBuilder().append(Long.toString(qqNumber)).append(" 不存在");
 			sender.sendMessage(fail.asMessageChain());
 		}
 	}

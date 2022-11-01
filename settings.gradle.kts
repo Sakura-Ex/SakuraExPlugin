@@ -1,1 +1,1 @@
-rootProject.name = "SakuraExPluginQQ"
+rootProject.name = "SakuraExPlug"

@@ -34,9 +34,9 @@ public final class GroupRemoveCommand extends ComplexFriendCommand {
 	public void detailedHelp() {
 		argCanOmit();
 		MessageChainBuilder mcb = new MessageChainBuilder().append(usageHelp()).append("\n");
-		mcb.append("group id: The group you want to cancel permission.\n");
-		mcb.append("member id: THe group member you want to cancel permission.\n");
-		mcb.append("Omit it to refer to all members in the group.");
+		mcb.append("group id: 你想取消权限的群的群号\n");
+		mcb.append("member id: 你想取消权限的群成员的 qq 号\n");
+		mcb.append("省略 <member id> 以取消整个群的权限。\n注：成员会一并删除，需重新添加");
 		getContact().sendMessage(mcb.asMessageChain());
 	}
 	
@@ -54,28 +54,28 @@ public final class GroupRemoveCommand extends ComplexFriendCommand {
 						if (whiteGroupList.containsKey(groupNumber)) {
 							Set<Long> qqNumberList = whiteGroupList.get(groupNumber);
 							if (qqNumberList.remove(qqNumber)) {
-								mcb.append("Remove member ").append(String.valueOf(qqNumber)).append(" from group ")
-										.append(String.valueOf(groupNumber)).append(" successfully.");
+								mcb.append("从群 ").append(String.valueOf(groupNumber)).append(" 删除成员 ")
+										.append(String.valueOf(qqNumber)).append(" 成功");
 								getContact().sendMessage(mcb.asMessageChain());
 							} else {
-								getContact().sendMessage("Member " + qqNumber + " does not exist in group " + groupNumber + ".");
+								getContact().sendMessage("成员 " + qqNumber + " 不在群 " + groupNumber + " 的授权名单内");
 							}
 						} else {
-							getContact().sendMessage("Group " + groupNumber + " does not exist in whitelist.");
+							getContact().sendMessage("群 " + groupNumber + " 不在授权名单内");
 						}
 					} catch (NumberFormatException e) {
-						getContact().sendMessage("Please enter right qq number.");
+						getContact().sendMessage("请输入正确的 qq 号");
 					}
 				} else {
 					if (whiteGroupList.containsKey(groupNumber)) {
 						whiteGroupList.remove(groupNumber);
-						getContact().sendMessage("Remove group " + groupNumber + " successfully.");
+						getContact().sendMessage("删除群 " + groupNumber + " 成功");
 					} else {
-						getContact().sendMessage("Group number " + groupNumber + " does not exist in whitelist.");
+						getContact().sendMessage("群 " + groupNumber + " 不在授权名单内");
 					}
 				}
 			} catch (NumberFormatException e) {
-				getContact().sendMessage("Please enter right group number.");
+				getContact().sendMessage("请输入正确的群号");
 			}
 		} else {
 			detailedHelp();

@@ -2,16 +2,23 @@ package cn.sakuraex.sakuraexplug.command;
 
 public interface ICommand {
 	/**
-	 * Write your command name here.
+	 * 在这里写下你的指令名称。
 	 * <p>
-	 * For example
+	 * 例如：
 	 * </p>
 	 * {@code /example}
+	 * <p>
+	 * 写法：
+	 * </p>
+	 * {@code return "/example";}
 	 *
-	 * @return your command name
+	 * @return 你的指令名称
 	 */
 	String getName();
+	
 	void react();
+	
 	void detailedHelp();
+	
 	String usageHelp();
 }

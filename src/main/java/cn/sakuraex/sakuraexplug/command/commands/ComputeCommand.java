@@ -8,7 +8,7 @@ import java.util.List;
 
 public abstract class ComputeCommand extends SingleArgGroupCommand {
 	
-	private static final String PRECISE_E = "2.7182818284590452353602874713526624977572470936999595749669676277";
+	private static final String PRECISE_E = "2.7182818284590452353602874713526624977572470936999595749669676277"; // 64位小数
 	private static final String PRECISE_PI = "3.1415926535897932384626433832795028841971693993751058209749445923";
 	
 	protected ComputeCommand(GroupMessageEvent event, String argName) {

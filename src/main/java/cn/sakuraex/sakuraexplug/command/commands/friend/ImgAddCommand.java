@@ -39,8 +39,8 @@ public final class ImgAddCommand extends ComplexFriendCommand {
 	@Override
 	public void detailedHelp() {
 		MessageChainBuilder mcb = new MessageChainBuilder().append(usageHelp()).append("\n");
-		mcb.append("type: The type you want put api in.\n");
-		mcb.append("api link: A url that return an image.");
+		mcb.append("type: 你想添加的 api 的图片类型\n");
+		mcb.append("api link: 直接返回图片的 api 链接");
 		getContact().sendMessage(mcb.asMessageChain());
 	}
 	
@@ -56,14 +56,14 @@ public final class ImgAddCommand extends ComplexFriendCommand {
 					apis.put(getArg(0), typedLink);
 					ImgFolder.createImgFolder(imgFolder, logger);
 				} catch (MalformedURLException e) {
-					getContact().sendMessage("Please check the api link.");
+					getContact().sendMessage("请检查 api 地址是否正确");
 					return;
 				}
 			}
 			if (apis.get(getArg(0)).add(getArg(1))) {
-				getContact().sendMessage("Add api Link " + getArg(1) + " successfully.");
+				getContact().sendMessage("添加 api 链接 " + getArg(1) + " 成功");
 			} else {
-				getContact().sendMessage("Api Link " + getArg(1) + " is already in the imageAPIs.");
+				getContact().sendMessage("api 链接 " + getArg(1) + " 已被添加");
 			}
 		} else {
 			detailedHelp();

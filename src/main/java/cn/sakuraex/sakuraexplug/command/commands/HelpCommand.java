@@ -34,7 +34,7 @@ public final class HelpCommand<T extends Contact> extends NoArgCommand<Contact> 
 	public void react() {
 		MessageChainBuilder mcb = event instanceof GroupMessageEvent ?
 				MessageUtil.groupQuoteAndAtMCB(getSource(), (Member) getUser()).append("\n") : new MessageChainBuilder();
-		mcb.append("Available Command:\n");
+		mcb.append("可用指令:\n");
 		for (AbstractCommand<T> command : this.commands) {
 			mcb.append(command.usageHelp()).append("\n");
 		}

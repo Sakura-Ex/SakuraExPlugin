@@ -20,7 +20,7 @@ public final class RandMuteCommand extends NoArgGroupCommand {
 	}
 	
 	{
-		setInfo("Randomly mute yourself from 1 to 3600 seconds.");
+		setInfo("随机禁言自己1-3600秒");
 	}
 	
 	@Override
@@ -34,9 +34,9 @@ public final class RandMuteCommand extends NoArgGroupCommand {
 		MessageChainBuilder mcb = MessageUtil.groupQuoteAndAtMCB(getSource(), (Member) getUser());
 		try {
 			((Member) getUser()).mute(duration);
-			mcb.append(" Enter a ").append(String.valueOf(duration)).append("-second mediation state.");
+			mcb.append("进入了 ").append(String.valueOf(duration)).append(" 秒的禅定状态");
 		} catch (PermissionDeniedException e) {
-			mcb.append(" You are the superior, I couldn't mute you.");
+			mcb.append("我不能禁言您");
 		}
 		getContact().sendMessage(mcb.asMessageChain());
 	}

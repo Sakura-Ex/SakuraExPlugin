@@ -35,9 +35,9 @@ public final class GroupAddCommand extends ComplexFriendCommand {
 	public void detailedHelp() {
 		argCanOmit();
 		MessageChainBuilder mcb = new MessageChainBuilder().append(usageHelp()).append("\n");
-		mcb.append("group id: The group you want to give permission to.\n");
-		mcb.append("member id: THe group member you want to give permission to.\n");
-		mcb.append("Omit it to refer to all members in the group.");
+		mcb.append("group id: 你想给予权限的群的群号\n");
+		mcb.append("member id: 你想给予权限的群成员的 qq 号\n");
+		mcb.append("省略 <member id> 给予该群所有成员权限");
 		getContact().sendMessage(mcb.asMessageChain());
 	}
 	
@@ -59,18 +59,18 @@ public final class GroupAddCommand extends ComplexFriendCommand {
 								add(qqNumber);
 							}});
 						}
-						mcb.append("Add member ").append(String.valueOf(qqNumber)).append(" to group ")
-								.append(String.valueOf(groupNumber)).append(" successfully.");
+						mcb.append("添加成员 ").append(String.valueOf(qqNumber)).append(" 到群 ")
+								.append(String.valueOf(groupNumber)).append(" 成功");
 						getContact().sendMessage(mcb.asMessageChain());
 					} catch (NumberFormatException e) {
-						getContact().sendMessage("Please enter right qq number.");
+						getContact().sendMessage("请输入正确的 qq 号");
 					}
 				} else {
 					whiteGroupList.put(groupNumber, new TreeSet<>());
-					getContact().sendMessage("Add group " + groupNumber + " successfully.");
+					getContact().sendMessage("添加群 " + groupNumber + " 成功");
 				}
 			} catch (NumberFormatException e) {
-				getContact().sendMessage("Please enter right group number.");
+				getContact().sendMessage("请输入正确的群号");
 			}
 		} else {
 			detailedHelp();

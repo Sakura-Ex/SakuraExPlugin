@@ -36,10 +36,10 @@ public final class SakuraExPlug extends JavaPlugin {
 	private long imgCommandTimeFlag = 0;
 	
 	private SakuraExPlug() {
-		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.3.1")
-				.name("SakuraExPluginQQ")
+		super(new JvmPluginDescriptionBuilder("cn.sakuraex.sakuraexplug", "0.3.2")
+				.name("SakuraExPlug")
 				.author("SakuraEx")
-				.info("SakuraEx's assistant")
+				.info("SakuraEx 的小助手")
 				.build());
 	}
 	
@@ -141,7 +141,7 @@ public final class SakuraExPlug extends JavaPlugin {
 						AbstractCommand.react(new DeOpCommand(event));
 						break;
 					default:
-						event.getSender().sendMessage("Try using /help to learn what can I do.");
+						event.getSender().sendMessage("使用 /help 指令看看我能做什么");
 						break;
 				}
 			}

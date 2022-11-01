@@ -32,7 +32,7 @@
 | /img+ \<type\> \<api link\>        | 往对应类别 API 库中添加一个 API。若类别不存在，则自动创建 |
 | /img- \<type\> \[api link\]        | 删除对应 API 库中对应的 API，留空表示删除类别       |
 | /group+ \<group id\> \[member id\] | 给予某 qq 群特定成员所有群指令权限，留空 qq 表示所有群成员 |
-| /group- \<group id\> \[member id\] | 剥夺某 qq 群特定成员所有群指令权限，留空 qq 表示所有群成员 |
+| /group- \<group id\> \[member id\] | 删除某 qq 群特定成员所有群指令权限，留空 qq 表示所有群成员 |
 
 格式：\\指令名 \<必填参数\> \[可选参数\]
 
