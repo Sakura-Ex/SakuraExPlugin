@@ -20,7 +20,8 @@ public abstract class ComputeCommand extends SingleArgGroupCommand {
 	}
 	
 	protected String transformExp(String exp) {
-		return MessageUtil.trimAllSpace(exp).replaceAll("(\\(|^)([+-])([\\d.]*)", "$1(0$2$3)");
+		return MessageUtil.trimAllSpace(exp).replaceAll("(?<=\\(|^)-(?=[\\d.]*)", "(0-1)*")
+				.replaceAll("(?<=\\(|^)+(?=[\\d.]*)", "");
 	}
 	
 	protected List<String> resolveExpr(String expression) {
