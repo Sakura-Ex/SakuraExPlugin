@@ -1,4 +1,4 @@
-package cn.sakuraex.sakuraexplug.command.commands.group;
+package cn.sakuraex.sakuraexplug.util;
 
 import java.math.BigInteger;
 import java.util.*;
@@ -14,13 +14,19 @@ public class Expression {
 	private final List<Integer> bracketsList = new ArrayList<>();
 	private String result = null;
 	private String selfOperator = "";
+	private final boolean subExpression;
 	
 	private Expression(String exp, String selfOperator) {
-		this(exp);
+		this(exp, true);
 		this.selfOperator = selfOperator;
 	}
 	
 	public Expression(String exp) {
+		this(exp, false);
+	}
+	
+	private Expression(String exp, boolean subExpression) {
+		this.subExpression = subExpression;
 		exp = exp.trim().replaceAll("\\s", "");
 		if (exp.equals("")) {
 			this.raw = "0";
@@ -30,7 +36,7 @@ public class Expression {
 			this.returnDecimal = false;
 			this.containsBrackets = false;
 			return;
-		} else if (exp.matches("[+*/-]")) {
+		} else if (exp.matches("[+*/^-]")) {
 			this.raw = exp;
 			this.expressionPart = null;
 			this.isSmallest = true;
@@ -43,7 +49,15 @@ public class Expression {
 			this.expressionPart = null;
 			this.isSmallest = false;
 			this.illegal = true;
-			this.returnDecimal = true;
+			this.returnDecimal = false;
+			this.containsBrackets = false;
+			return;
+		} else if (exp.matches("[*/^].*")) {
+			this.raw = exp;
+			this.expressionPart = null;
+			this.isSmallest = false;
+			this.illegal = true;
+			this.returnDecimal = false;
 			this.containsBrackets = false;
 			return;
 		}
@@ -54,7 +68,7 @@ public class Expression {
 			this.expressionPart = null;
 			this.isSmallest = true;
 			this.illegal = false;
-			this.returnDecimal = exp.contains(".") || exp.matches("\\w+");
+			this.returnDecimal = exp.contains(".") || exp.matches("[a-zA-Z]+");
 			this.containsBrackets = false;
 			return;
 		}
@@ -68,7 +82,7 @@ public class Expression {
 			return;
 		}
 		//去掉首尾空格，将行首的负号替换为 (0-1)*，将行首的正号去除。（后面会提取括号内的表达式，届时左括号后的正负号会转化为行首的）
-		exp = exp.replaceAll("(^|[+-])-", "(0-1)*").replaceAll("(^|[+-])\\+", "");
+		//exp = exp.replaceAll("(^|[+-])-", "(0-1)*").replaceAll("(^|[+-])\\+", "");
 		int length = exp.length();
 		//利用 map 记录匹配的括号在行内的位置，key 为左括号的位置，value 为对应右括号的位置
 		Map<Integer, Integer> matchesBrackets = new HashMap<>();
@@ -123,7 +137,7 @@ public class Expression {
 		this.operation.put(3, new ArrayList<>());
 		for (int i = 0; i < length; i++) {
 			char present = exp.charAt(i);
-			if (Character.isDigit(present) || present == '.' || Character.isLetter(present)) {
+			if (Character.isDigit(present) || present == '.' || Character.isLetter(present) || (i == 0 && present == '-')) {
 				prevIsOperation = false;
 				sb.append(present);
 			} else if (present == '+' || present == '-' || present == '*' || present == '/' || present == '^') {
@@ -223,19 +237,26 @@ public class Expression {
 					if (expressionPart.get(i).raw.equals("pi")) {
 						expressionPart.set(i, new Expression(String.valueOf(Math.PI), expressionPart.get(0).selfOperator));
 					} else if (expressionPart.get(i).raw.equals("e")) {
-						expressionPart.set(i, new Expression(String.valueOf((Math.E)), expressionPart.get(0).selfOperator));
+						expressionPart.set(i, new Expression(String.valueOf(Math.E), expressionPart.get(0).selfOperator));
 					}
 				}
 				if (this.operation.get(3) != null) {
 					for (int i : this.operation.get(3)) {
-						double prevValue = Double.parseDouble(expressionPart.get(i - shorten - 1).calculate());
-						double nextValue = Double.parseDouble(expressionPart.get(i - shorten + 1).calculate());
-						expressionPart.set(i - shorten, new Expression(Double.toString(Math.pow(prevValue, nextValue))));
+						double prevValue = Double.parseDouble(expressionPart.get(i - 1).calculate());
+						double nextValue = Double.parseDouble(expressionPart.get(i + 1).calculate());
+						expressionPart.set(i - 1 - shorten, new Expression(Double.toString(Math.pow(prevValue, nextValue))));
 						expressionPart.remove(i - shorten);
 						expressionPart.remove(i - shorten);
+						List<Integer> md = this.operation.get(2);
+						for (int j = 0; j < md.size(); j++) {
+							if (md.get(j) > i - shorten) {
+								md.set(j, md.get(j) - 2);
+							}
+						}
 						shorten += 2;
 					}
 				}
+				shorten = 0;
 				if (this.operation.get(2) != null) {
 					for (int i : this.operation.get(2)) {
 						double prevValue = Double.parseDouble(expressionPart.get(i - shorten - 1).calculate());
@@ -269,7 +290,7 @@ public class Expression {
 						result = Math.E;
 						break;
 					default:
-						if (this.raw.matches("\\d+\\.?\\d*")) {
+						if (this.raw.matches("[+-]?\\d+\\.?\\d*")) {
 							result = Double.parseDouble(this.raw);
 						} else {
 							result = 1;
@@ -286,14 +307,21 @@ public class Expression {
 				expressionPart = new ArrayList<>(this.expressionPart);
 				if (this.operation.get(3) != null) {
 					for (int i : this.operation.get(3)) {
-						BigInteger prevValue = new BigInteger(expressionPart.get(i - shorten - 1).calculate());
-						int nextValue = Integer.parseInt(expressionPart.get(i - shorten + 1).calculate());
-						expressionPart.set(i - shorten, new Expression(prevValue.pow(nextValue).toString()));
+						BigInteger prevValue = new BigInteger(expressionPart.get(i - 1 - shorten).calculate());
+						int nextValue = Integer.parseInt(expressionPart.get(i + 1 - shorten).calculate());
+						expressionPart.set(i - 1 - shorten, new Expression(prevValue.pow(nextValue).toString()));
 						expressionPart.remove(i - shorten);
 						expressionPart.remove(i - shorten);
+						List<Integer> md = this.operation.get(2);
+						for (int j = 0; j < md.size(); j++) {
+							if (md.get(j) > i - shorten) {
+								md.set(j, md.get(j) - 2);
+							}
+						}
 						shorten += 2;
 					}
 				}
+				shorten = 0;
 				if (this.operation.get(2) != null) {
 					for (int i : this.operation.get(2)) {
 						BigInteger prevValue = new BigInteger(expressionPart.get(i - shorten - 1).calculate());
@@ -371,15 +399,22 @@ public class Expression {
 	
 	@Override
 	public String toString() {
+		if (this.illegal) {
+			return this.raw;
+		}
 		if (this.isSmallest) {
 			if (this.selfOperator.equals("")) {
-				return this.raw;
+				if (this.raw.matches("-.+")) {
+					return "(" + this.raw + ")";
+				} else {
+					return this.raw;
+				}
 			} else {
 				return this.selfOperator + "(" + this.raw + ")";
 			}
 		}
 		StringBuilder sb = new StringBuilder();
-		String format = this.selfOperator.equals("") ? "%s" : this.selfOperator + "(%s)";
+		String format = !this.selfOperator.equals("") || this.subExpression ? this.selfOperator + "(%s)" : "%s";
 		for (Expression part : this.expressionPart) {
 			sb.append(part.toString());
 		}
