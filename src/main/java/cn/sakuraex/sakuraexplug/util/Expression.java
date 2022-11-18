@@ -4,21 +4,23 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class Expression {
-	public final String raw;
-	public final List<Expression> expressionPart;
-	public final boolean isSmallest;
-	public final boolean illegal;
-	public final boolean returnDecimal;
-	public final boolean containsBrackets;
+	private final String raw;
+	private final List<Expression> expressionPart;
+	private String str = null;
+	private final boolean isSmallest;
+	private final boolean illegal;
+	private boolean returnDecimal;
+	private final boolean containsBrackets;
 	private final Map<Integer, List<Integer>> operation = new HashMap<>(); // key：计算优先级；value：符号所在位置构成的列表
 	private final List<Integer> bracketsList = new ArrayList<>();
+	private final boolean subExpression;
 	private String result = null;
 	private String selfOperator = "";
-	private final boolean subExpression;
 	
 	private Expression(String exp, String selfOperator) {
 		this(exp, true);
 		this.selfOperator = selfOperator;
+		this.returnDecimal = true;
 	}
 	
 	public Expression(String exp) {
@@ -174,6 +176,7 @@ public class Expression {
 		}
 		this.expressionPart = expressionPart;
 		this.illegal = false;
+		this.str = this.toString();
 	}
 	
 	private boolean isLeftBracket(char c) {
@@ -399,6 +402,9 @@ public class Expression {
 	
 	@Override
 	public String toString() {
+		if (this.str != null) {
+			return this.str;
+		}
 		if (this.illegal) {
 			return this.raw;
 		}
